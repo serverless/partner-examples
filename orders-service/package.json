@@ -1,0 +1,16 @@
+{
+  "name": "sfe-demo-leadcapture",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Serverless.com",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "serverless-finch": "^2.3.2",
+    "serverless-python-requirements": "^5.0.0"
+  }
+}

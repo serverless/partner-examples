@@ -1,0 +1,70 @@
+org: fernando
+app: backup-app
+service: demo-email-form-backup
+
+frameworkVersion: '>=1.38.0 <2.0.0'
+
+provider:
+  name: aws
+  runtime: python3.7
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'sns:createTopic'
+        - 'sns:deleteTopic'
+        - 'sns:publish'
+        - 'dynamodb:putItem'
+      Resource:
+        - '*'
+  logs:
+    restApi: true
+
+functions:
+  formSubmit:
+    runtime: nodejs10.x
+    handler: handler.submit
+    events:
+      - http:
+          path: submit
+          method: post
+          cors: true
+  formProcess:
+    runtime: python3.7
+    handler: handler.process
+    events:
+      - http:
+          path: process
+          method: post
+          cors: true
+  pingEndpoints:
+    runtime: python3.7
+    handler: ping.ping
+    events:
+      - schedule: rate(5 minutes)
+
+resources:
+  Resources:
+    ordersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: orders-table
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+package:
+  individually: true
+  exclude:
+    - .git/**
+    - .serverless_plugins/**
