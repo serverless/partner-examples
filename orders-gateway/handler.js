@@ -8,6 +8,7 @@ AWS.config.update({region:'us-east-1'});
 
 var sns = new AWS.SNS();
 var dynamodb = new AWS.DynamoDB();
+var dynamodbTableName = process.env.DYNAMODB_TABLE;
 
 const submit = async (event, context) => {
   context.serverlessSdk.tagEvent('customerId', 5, { newCustomer: true, isDemo: true, demoExpire: '2019-12-01' })
@@ -53,7 +54,7 @@ const submit = async (event, context) => {
         "email": { S: "fernando@serverless.com" }, 
       }, 
       ReturnConsumedCapacity: "TOTAL", 
-      TableName: "orders-table"
+      TableName: dynamodbTableName
     };
     const putData = await dynamodb.putItem(dynamoParams).promise()
     console.log('Put the item in DynamoDB')

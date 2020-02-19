@@ -2,9 +2,10 @@ import boto3
 import requests
 import random
 import json
+import os
 
 dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('orders-table')
+table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 sns = boto3.client('sns')
 
 def process(event, context):
@@ -41,5 +42,5 @@ def process(event, context):
     print("Table Item Added")
     return {
         "statusCode": 200,
-        "body": json.dumps(response)
+        "body": json.dumps({"status": "success"})
     }

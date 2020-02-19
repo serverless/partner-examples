@@ -1,12 +1,14 @@
-org: fernando
-app: backup-app
-service: demo-email-form-backup
+org: serverlesspartners
+app: orders
+service: orders-gateway
 
 frameworkVersion: '>=1.38.0 <2.0.0'
 
 provider:
   name: aws
   runtime: python3.7
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -47,7 +49,7 @@ resources:
     ordersTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: orders-table
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
         AttributeDefinitions:
           - AttributeName: email
             AttributeType: S
@@ -55,6 +57,12 @@ resources:
           - AttributeName: email
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+outputs:
+  ordersTableStreamArn: 
+      Fn::GetAtt: [ordersTable, StreamArn]
 
 plugins:
   - serverless-python-requirements
